@@ -10,7 +10,7 @@ const Signup = () => {
       <SignupCard>
         <Head>
           <BackButton type="button" onClick={() => navigate('/start')} aria-label="뒤로가기">←</BackButton>
-          <Title>회원가입</Title>
+          <Title>Sign Up</Title>
         </Head>
         <form>
           <Input type="text" placeholder="아이디" autoComplete="username" />

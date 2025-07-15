@@ -35,7 +35,7 @@ export const LoginCard = styled.div`
 export const Title = styled.h1`
   color: #333;
   font-size: 1.3rem;
-  margin: 0;
+  margin: 0 10px;
   letter-spacing: 1px;
   position: absolute;
   left: 50%;
@@ -47,7 +47,7 @@ export const Title = styled.h1`
 export const Input = styled.input`
   width: 100%;
   padding: 14px 12px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   border: 2px solid #bdbdbd;
   border-radius: 6px;
   background: #fff;

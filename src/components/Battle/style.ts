@@ -147,6 +147,7 @@ export const UserWrapper = styled.div`
     img:nth-child(2) {
         position: relative;
         left: 5%;
+        bottom: 10%;
         z-index: 0;
     }
 `;
@@ -251,7 +252,7 @@ export const HpNumber = styled.div`
 export const SkillBoxWrap = styled.div`
     padding-top: 5px;
     width: 394px;
-    height: 361px;
+    height: 251px;
     border: 3px solid #838383;
     border-bottom: none;
     border-radius: 15px 15px 0px 0px;
@@ -262,7 +263,7 @@ export const SkiilBox = styled.div`
     justify-content: center;
     align-items: center;
     width: 382px;
-    height: 348px;
+    height: 271px;
     border: 3px solid #838383;
     border-radius: 15px 15px 0px 0px;
     border-bottom: none;

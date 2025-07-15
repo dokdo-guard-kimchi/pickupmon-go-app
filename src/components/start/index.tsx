@@ -1,10 +1,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../assets/logo.svg'
+
 import {
   Container,
   GameCard,
-  Logo,
   Title,
   Subtitle,
   ButtonContainer,

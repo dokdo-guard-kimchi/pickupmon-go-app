@@ -31,7 +31,16 @@ const Login = () => {
     try {
       await loginUser(formData);
       alert('로그인 성공!');
-      navigate('/');
+      
+      // 첫 방문자인지 확인
+      const hasSelectedCharacter = localStorage.getItem('characterSelected');
+      if (!hasSelectedCharacter) {
+        // 첫 방문자는 캐릭터 선택 페이지로
+        navigate('/charactor');
+      } else {
+        // 기존 사용자는 메인 페이지로
+        navigate('/');
+      }
     } catch (error) {
       alert(error instanceof Error ? error.message : '로그인에 실패했습니다.');
     } finally {

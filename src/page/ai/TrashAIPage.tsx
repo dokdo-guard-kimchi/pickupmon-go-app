@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 // 스타일 컴포넌트
@@ -304,6 +305,8 @@ interface ModelConfig {
 
 // 메인 컴포넌트
 const TrashAIPage: React.FC = () => {
+  const navigation = useNavigate();
+
   // 상태 관리
   const [modelLoaded, setModelLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -687,17 +690,18 @@ const TrashAIPage: React.FC = () => {
         setIsPopupVisible(false);
         setShowTransition(true);
         
-        // 트랜지션 애니메이션 후 상태 정리
+        // 트랜지션 애니메이션 후 상태 정리 및 /battle 페이지로 이동
         setTimeout(() => {
           setShowTransition(false);
           setCapturedImage(null);
           setCapturedDetection(null);
+          navigation('/battle');
         }, 5000);
       }, 2000);
       
       return () => clearTimeout(timer);
     }
-  }, [isPopupVisible]);
+  }, [isPopupVisible, navigation]);
 
   return (
     <AppContainer>

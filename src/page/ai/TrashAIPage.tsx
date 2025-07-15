@@ -151,6 +151,71 @@ const CameraIcon = () => (
   </svg>
 );
 
+const PopupOverlay = styled.div<{ isVisible: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: ${props => props.isVisible ? 'flex' : 'none'};
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const PopupContent = styled.div`
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const PopupImage = styled.img`
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+`;
+
+const PopupTitle = styled.h3`
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 18px;
+`;
+
+const PopupInfo = styled.p`
+  margin: 5px 0;
+  color: #666;
+  font-size: 14px;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: #ff3742;
+  }
+`;
+
 // 타입 정의
 interface Detection {
   class: string;
@@ -178,6 +243,9 @@ const TrashAIPage: React.FC = () => {
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
   const [detectionProgress, setDetectionProgress] = useState(0);
   const [isButtonActive, setIsButtonActive] = useState(false);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [capturedDetection, setCapturedDetection] = useState<Detection | null>(null);
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -363,6 +431,48 @@ const TrashAIPage: React.FC = () => {
     });
   }, [classColors]);
 
+  // 감지 영역 캡처 함수
+  const captureDetectionArea = useCallback((detection: Detection): string => {
+    if (!videoRef.current || !canvasRef.current) return '';
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // 새 캔버스 생성
+    const captureCanvas = document.createElement('canvas');
+    const captureCtx = captureCanvas.getContext('2d');
+    if (!captureCtx) return '';
+
+    const scaleX = canvas.width / video.videoWidth;
+    const scaleY = canvas.height / video.videoHeight;
+    
+    // 감지 영역 계산
+    const bbox = detection.bbox;
+    const x = (bbox.x - bbox.width / 2) * scaleX;
+    const y = (bbox.y - bbox.height / 2) * scaleY;
+    const width = bbox.width * scaleX;
+    const height = bbox.height * scaleY;
+    
+    // 캡처 영역에 여백 추가
+    const padding = 20;
+    const cropX = Math.max(0, x - padding);
+    const cropY = Math.max(0, y - padding);
+    const cropWidth = Math.min(canvas.width - cropX, width + padding * 2);
+    const cropHeight = Math.min(canvas.height - cropY, height + padding * 2);
+    
+    captureCanvas.width = cropWidth;
+    captureCanvas.height = cropHeight;
+    
+    // 비디오에서 해당 영역 캡처
+    captureCtx.drawImage(
+      video,
+      cropX / scaleX, cropY / scaleY, cropWidth / scaleX, cropHeight / scaleY,
+      0, 0, cropWidth, cropHeight
+    );
+    
+    return captureCanvas.toDataURL('image/jpeg', 0.8);
+  }, []);
+
   // 감지 수행
   const performDetection = useCallback(async () => {
     if (!workerIdRef.current || !streamRef.current || !videoRef.current) return;
@@ -374,8 +484,8 @@ const TrashAIPage: React.FC = () => {
       const cvimg = new CVImage(video);
       const predictions = await inferEngineRef.current.infer(workerIdRef.current, cvimg);
       
-      // 신뢰도 필터링 (0.5 이상)
-      const filteredPredictions = predictions.filter((pred: Detection) => pred.confidence >= 0.5);
+      // 신뢰도 필터링 제거 - 모든 감지 결과 표시
+      const filteredPredictions = predictions;
       
       setCurrentDetections(filteredPredictions);
       drawDetections(filteredPredictions);
@@ -438,10 +548,21 @@ const TrashAIPage: React.FC = () => {
 
   // 카메라 버튼 클릭 핸들러
   const handleCameraClick = useCallback(() => {
-    if (isButtonActive) {
+    if (isButtonActive && currentDetections.length > 0) {
       console.log('카메라 버튼 클릭됨! 현재 감지된 쓰레기:', currentDetections);
-      console.log('감지 시작 시간:', detectionStartTimeRef.current);
-      console.log('진행률:', detectionProgress);
+      
+      // 가장 높은 신뢰도의 감지 항목 선택
+      const bestDetection = currentDetections.reduce((prev, current) => 
+        prev.confidence > current.confidence ? prev : current
+      );
+      
+      // 감지 영역 캡처
+      const capturedImageData = captureDetectionArea(bestDetection);
+      
+      // 팝업 표시
+      setCapturedImage(capturedImageData);
+      setCapturedDetection(bestDetection);
+      setIsPopupVisible(true);
       
       // 버튼 클릭 후 상태 초기화
       detectionStartTimeRef.current = null;
@@ -449,7 +570,14 @@ const TrashAIPage: React.FC = () => {
       setIsButtonActive(false);
       console.log('버튼 상태 초기화 완료');
     }
-  }, [isButtonActive, currentDetections, detectionProgress]);
+  }, [isButtonActive, currentDetections, captureDetectionArea]);
+
+  // 팝업 닫기 핸들러
+  const handleClosePopup = useCallback(() => {
+    setIsPopupVisible(false);
+    setCapturedImage(null);
+    setCapturedDetection(null);
+  }, []);
 
   return (
     <AppContainer>
@@ -477,6 +605,24 @@ const TrashAIPage: React.FC = () => {
           </LoadingContent>
         </LoadingOverlay>
       )}
+
+      <PopupOverlay isVisible={isPopupVisible} onClick={handleClosePopup}>
+        <PopupContent onClick={(e) => e.stopPropagation()}>
+          <CloseButton onClick={handleClosePopup}>×</CloseButton>
+          {capturedImage && (
+            <>
+              <PopupImage src={capturedImage} alt="감지된 쓰레기" />
+              {capturedDetection && (
+                <>
+                  <PopupTitle>감지 결과</PopupTitle>
+                  <PopupInfo>분류: {capturedDetection.class}</PopupInfo>
+                  <PopupInfo>신뢰도: {Math.round(capturedDetection.confidence * 100)}%</PopupInfo>
+                </>
+              )}
+            </>
+          )}
+        </PopupContent>
+      </PopupOverlay>
     </AppContainer>
   );
 };

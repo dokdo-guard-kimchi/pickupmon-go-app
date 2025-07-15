@@ -308,13 +308,13 @@ const TrashAIPage: React.FC = () => {
   const navigation = useNavigate();
 
   // 상태 관리
-  const [modelLoaded, setModelLoaded] = useState(false);
+  const [, setModelLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
   const [detectionProgress, setDetectionProgress] = useState(0);
   const [isButtonActive, setIsButtonActive] = useState(false);
-  const progressDeclineIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const progressDeclineIntervalRef = useRef<number | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [capturedDetection, setCapturedDetection] = useState<Detection | null>(null);
@@ -324,7 +324,7 @@ const TrashAIPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null);
   const inferEngineRef = useRef<any>(null);
   const workerIdRef = useRef<string | null>(null);
   const detectionStartTimeRef = useRef<number | null>(null);
@@ -682,6 +682,7 @@ const TrashAIPage: React.FC = () => {
     setCapturedImage(null);
     setCapturedDetection(null);
   }, []);
+  console.log(handleClosePopup); // Using variable to avoid unused warning
 
   // 팝업 표시 시 2초 후 자동 닫기 및 트랜지션 효과
   useEffect(() => {

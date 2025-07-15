@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Main from './src/components/main/index'
+import BattlePage from './src/components/Battle';
 import Start from './src/components/start/index'
 import Login from './src/components/login/index'
 import SignUp from './src/components/signup/index'
@@ -11,6 +12,7 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Main />} />
+        <Route path='/battle' element={<BattlePage />} />
         <Route path='/start' element={<Start />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signUp' element={<SignUp />} />

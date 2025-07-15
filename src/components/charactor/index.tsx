@@ -16,8 +16,15 @@ const CharactorSelect = () => {
   const dimRedPoly = isBoySelected;
 
   const movePage = () => {
-    selected && alert(`${selected === 'male' ? '남자' : '여자'} 캐릭터가 선택되었습니다!`)
-    navigate('/main')
+    if (selected) {
+      alert(`${selected === 'male' ? '남자' : '여자'} 캐릭터가 선택되었습니다!`)
+      
+      // 캐릭터 선택 완료를 localStorage에 저장
+      localStorage.setItem('characterSelected', 'true')
+      localStorage.setItem('selectedCharacter', selected)
+      
+      navigate('/')
+    }
   }
 
   return (

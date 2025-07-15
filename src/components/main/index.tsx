@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Container, Card, AvatarWrapper, Avatar, Nickname, ExpBarArea, LevelRow, LevelLabel, LevelValue, ExpBar, ExpBarFill, ExpText, Skills, SkillButton, StartButton } from './style'
 import AvatarImg from '../../assets/boy.svg'
-
+import DownBar from '../DownBar/index'
 const Main = () => {
   const navigate = useNavigate()
 
@@ -55,8 +55,11 @@ const Main = () => {
           ))}
         </Skills>
         <StartButton onClick={() => navigate('/camera')}>시작하기</StartButton>
+        <DownBar />
       </Card>
+    
     </Container>
+    
   )
 }
 

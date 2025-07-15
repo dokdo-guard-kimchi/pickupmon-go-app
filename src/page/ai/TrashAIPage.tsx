@@ -209,12 +209,12 @@ const PokemonTransition = styled.div<{ isVisible: boolean }>`
   overflow: hidden;
 `;
 
-const HorizontalLine = styled.div<{ delay: number; position: number }>`
+const HorizontalLine = styled.div<{ delay: number; position: number; lineHeight: number }>`
   position: absolute;
-  top: ${props => props.position}%;
+  top: ${props => props.position * props.lineHeight}vh;
   right: -100%;
   width: 100%;
-  height: 3px;
+  height: ${props => props.lineHeight}vh;
   background: #000;
   animation: horizontalLineSlide 2.5s ease-out ${props => props.delay}s forwards;
   
@@ -692,7 +692,7 @@ const TrashAIPage: React.FC = () => {
           setShowTransition(false);
           setCapturedImage(null);
           setCapturedDetection(null);
-        }, 3000);
+        }, 5000);
       }, 2000);
       
       return () => clearTimeout(timer);
@@ -745,20 +745,23 @@ const TrashAIPage: React.FC = () => {
 
       <PokemonTransition isVisible={showTransition}>
         <BackgroundReveal isVisible={showTransition} />
-        {Array.from({ length: 30 }, (_, i) => {
-          const position = (i * 3.33); // 위에서 아래로 3.33% 간격
-          const delay = i * 0.05; // 순차적 시작
+        {Array.from({ length: 8 }, (_, i) => {
+          const lineHeight = 100 / 8; // 전체 높이(100vh) / 선의 개수(8) = 12.5vh
+          const position = i; // 0, 1, 2, ... 7
+          const delay = i * 0.16; // 순차적 시작 (0.3초 간격)
           return (
             <HorizontalLine 
               key={i} 
               delay={delay} 
               position={position}
+              lineHeight={lineHeight}
             />
           );
         })}
         <TransitionOverlay>
           <TransitionContent isVisible={showTransition}>
-            쓰레기 분석 완료!
+            
+
           </TransitionContent>
         </TransitionOverlay>
       </PokemonTransition>

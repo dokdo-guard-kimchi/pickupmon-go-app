@@ -7,10 +7,10 @@ export const MainWrap = styled.div`
     align-items:center;
     justify-content:space-around;
     position:relative;
-    top:210px;
+    top:134%;
     width:393px;
     height:80px;
-    border: 1px solid;
+    border-top:1px solid;
 `
 export const Box = styled.div`
     display:flex;

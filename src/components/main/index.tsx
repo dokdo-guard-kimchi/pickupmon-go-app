@@ -54,7 +54,7 @@ const Main = () => {
             </SkillButton>
           ))}
         </Skills>
-        <StartButton onClick={() => navigate('/')}>시작하기</StartButton>
+        <StartButton onClick={() => navigate('/camera')}>시작하기</StartButton>
       </Card>
     </Container>
   )

@@ -3,6 +3,7 @@ import * as S from './style';
 import battleStand from  '../../assets/battleStand.svg';
 import trash1 from '../../assets/trash1.svg'
 import UserBattleIcon from '../../assets/UserBattleIcon.svg'
+import UserBattleFemale from '../../assets/UserBattleFemale.svg'
 
 interface Skill {
     name: string;
@@ -31,6 +32,7 @@ const Battle: React.FC = () => {
     const [trashAnimation, setTrashAnimation] = useState<string>('');
     const [skillUses, setSkillUses] = useState<number[]>([5, 5, 3, 2]); // 각 스킬의 남은 사용 횟수
     const maxUserHp: number = 100;
+    const gender = localStorage.getItem('selectedCharacter');
 
     const userSkillList: Skill[] = [
         {
@@ -253,7 +255,8 @@ const Battle: React.FC = () => {
                 <S.UserWrapper>
                     <S.UserWrapperImg>
                         <S.AnimatedUser $animation={userAnimation}>
-                            <img src={UserBattleIcon} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />
+                            {gender === 'male' &&    <img src={UserBattleIcon} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />}
+                            {gender === 'female' && <img src={UserBattleFemale} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />}
                         </S.AnimatedUser>
                         <img src={battleStand} alt="" />
                     </S.UserWrapperImg>

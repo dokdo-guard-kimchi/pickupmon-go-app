@@ -10,6 +10,13 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  
+  /* iPhone 15 optimizations */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    overflow: hidden;
+  }
 `;
 
 export const Card = styled.div`
@@ -20,7 +27,7 @@ export const Card = styled.div`
   max-width: 393px;
   width: 393px;
   margin: 0;
-  padding: 0;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,6 +35,20 @@ export const Card = styled.div`
   min-height: unset;
   justify-content: flex-start;
   position: relative;
+  box-sizing: border-box;
+  
+  /* iPhone 15 specific dimensions (393x852) */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height */
+    max-width: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 25px 20px 15px 20px;
+    overflow-y: auto;
+  }
 `;
 
 export const AvatarWrapper = styled.div`
@@ -41,24 +62,49 @@ export const AvatarWrapper = styled.div`
   justify-content: center;
   margin-bottom: 12px;
   box-shadow: 0 0 0 4px #e0e0e0;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
 `;
 
 export const Avatar = styled.img`
   width: 90px;
   height: 110px;
   image-rendering: pixelated;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    width: 75px;
+    height: 95px;
+  }
 `;
 
 export const Nickname = styled.div`
   font-size: 1.1rem;
   margin-bottom: 18px;
   font-family: inherit;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    font-size: 1rem;
+    margin-bottom: 15px;
+  }
 `;
 
 export const ExpBarArea = styled.div`
   width: 100%;
   margin-bottom: 18px;
   position: relative;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    margin-bottom: 15px;
+  }
 `;
 
 export const LevelRow = styled.div`
@@ -142,6 +188,12 @@ export const Skills = styled.div`
   margin: 18px 0 28px 0;
   width: 100%;
   justify-content: space-between;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    gap: 8px;
+    margin: 15px 0 20px 0;
+  }
 `;
 
 export const SkillButton = styled.button`

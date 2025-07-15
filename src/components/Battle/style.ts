@@ -147,7 +147,6 @@ export const UserWrapper = styled.div`
     img:nth-child(2) {
         position: relative;
         left: 5%;
-        bottom:10%;
         z-index: 0;
     }
 `;
@@ -228,8 +227,13 @@ export const HpWrapper = styled.div`
 export const Hp = styled.div<HpProps>`
     width: ${props => props.$hpPercentage}%;
     height: 100%;
-    background-color: #14FE2B;
-    transition: width 0.3s ease;
+    background-color: ${props => {
+        if (props.$hpPercentage < 10) return '#FF0000'; // 빨간색 (10% 미만)
+        if (props.$hpPercentage < 30) return '#FC8466'; // 주황색 (30% 미만)
+        if (props.$hpPercentage < 70) return '#FFCB05'; // 노란색 (70% 미만)
+        return '#14FE2B'; // 초록색 (70% 이상)
+    }};
+    transition: width 0.3s ease, background-color 0.3s ease;
 `;
 
 export const HpNumber = styled.div`

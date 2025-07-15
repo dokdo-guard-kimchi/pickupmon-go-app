@@ -2,7 +2,6 @@ import styled from 'styled-components'
 
 export const Container = styled.div`
   min-height: 100vh;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,10 +17,10 @@ export const GameCard = styled.div`
   box-shadow: 0 0 16px #d1d1d1, 0 0 0 8px #e0e0e0 inset;
   padding: 40px 20px;
   text-align: center;
-  max-width: 400px;
+  max-width: 393px;
   width: 100%;
-  min-height: 400px;
-  height: 100%;
+  min-height: 792px;
+  height: 792px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -33,6 +32,7 @@ export const GameCard = styled.div`
     padding: 30px 15px;
     max-width: 90vw;
     min-height: 300px;
+    height: auto;
   }
 `
 

@@ -403,8 +403,10 @@ const TrashAIPage: React.FC = () => {
       const cvimg = new CVImage(video);
       const predictions = await inferEngineRef.current.infer(workerIdRef.current, cvimg);
       
-      // 신뢰도 필터링 (0.5 이상)
-      const filteredPredictions = predictions.filter((pred: Detection) => pred.confidence >= 0.5);
+      // 신뢰도 필터링 (0.5 이상) 및 recyclable 제외
+      const filteredPredictions = predictions.filter((pred: Detection) => 
+        pred.confidence >= 0.5 && pred.class.toLowerCase() !== 'recyclable'
+      );
       
       // 가장 신뢰도가 높은 한 개만 선택
       const topPrediction = filteredPredictions.length > 0 

@@ -18,13 +18,13 @@ export const Card = styled.div`
   border-radius: 18px;
   box-shadow: 0 0 0 6px #e0e0e0, 0 0 0 12px #bdbdbd;
   max-width: 393px;
-  width: 100%;
+  width: 393px;
   margin: 0;
-  padding: 36px 24px 84px 24px;
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  height: 852px;
   min-height: unset;
   justify-content: flex-start;
   position: relative;

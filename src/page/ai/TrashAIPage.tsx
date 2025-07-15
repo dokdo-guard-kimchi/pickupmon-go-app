@@ -97,6 +97,68 @@ const ErrorMessage = styled.div`
   z-index: 100;
 `;
 
+const DetectionArrow = styled.div<{ x: number; y: number; color: string }>`
+  position: absolute;
+  left: ${props => props.x}px;
+  top: ${props => props.y}px;
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid ${props => props.color};
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  animation: floatBob 2s ease-in-out infinite;
+  z-index: 50;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: -15px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 20px solid ${props => props.color};
+    opacity: 0.8;
+  }
+  
+  @keyframes floatBob {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+`;
+
+const DetectionLabel = styled.div<{ x: number; y: number; color: string }>`
+  position: absolute;
+  left: ${props => props.x}px;
+  top: ${props => props.y + 40}px;
+  background: ${props => props.color};
+  color: white;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: floatBob 2s ease-in-out infinite 0.5s;
+  z-index: 50;
+  
+  @keyframes floatBob {
+    0%, 100% {
+      transform: translateX(-50%) translateY(0px);
+    }
+    50% {
+      transform: translateX(-50%) translateY(-8px);
+    }
+  }
+`;
+
 // 타입 정의
 interface Detection {
   class: string;
@@ -263,46 +325,31 @@ const TrashAIPage: React.FC = () => {
     canvas.height = video.videoHeight;
   }, []);
 
-  // 감지 결과 그리기
-  const drawDetections = useCallback((predictions: Detection[]) => {
-    if (!canvasRef.current || !videoRef.current) return;
+  // 감지 결과 표시용 데이터 계산
+  const getDetectionPositions = useCallback((predictions: Detection[]) => {
+    if (!videoRef.current) return [];
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
     const video = videoRef.current;
+    const containerRect = video.getBoundingClientRect();
     
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    const scaleX = canvas.width / video.videoWidth;
-    const scaleY = canvas.height / video.videoHeight;
-    
-    predictions.forEach((prediction) => {
+    return predictions.map((prediction) => {
       const bbox = prediction.bbox;
-      const x = (bbox.x - bbox.width / 2) * scaleX;
-      const y = (bbox.y - bbox.height / 2) * scaleY;
-      const width = bbox.width * scaleX;
-      const height = bbox.height * scaleY;
+      const scaleX = containerRect.width / video.videoWidth;
+      const scaleY = containerRect.height / video.videoHeight;
+      
+      const centerX = bbox.x * scaleX;
+      const centerY = bbox.y * scaleY;
       
       const color = classColors[prediction.class.toLowerCase()] || '#ff4757';
-      
-      // 경계 상자 그리기
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x, y, width, height);
-      
-      // 레이블 배경
       const label = `${prediction.class} ${Math.round(prediction.confidence * 100)}%`;
-      ctx.font = 'bold 20px Arial';
-      const textWidth = ctx.measureText(label).width;
       
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y - 35, textWidth + 20, 35);
-      
-      // 레이블 텍스트
-      ctx.fillStyle = 'white';
-      ctx.fillText(label, x + 10, y - 10);
+      return {
+        x: centerX,
+        y: centerY - 50,
+        color,
+        label,
+        id: `${prediction.class}-${centerX}-${centerY}`
+      };
     });
   }, [classColors]);
 
@@ -321,12 +368,11 @@ const TrashAIPage: React.FC = () => {
       const filteredPredictions = predictions.filter((pred: Detection) => pred.confidence >= 0.5);
       
       setCurrentDetections(filteredPredictions);
-      drawDetections(filteredPredictions);
       
     } catch (error) {
       console.error('감지 오류:', error);
     }
-  }, [drawDetections]);
+  }, []);
 
   // 감지 루프 시작
   const startDetectionLoop = useCallback(() => {
@@ -353,12 +399,32 @@ const TrashAIPage: React.FC = () => {
     };
   }, []);
 
+  const detectionPositions = getDetectionPositions(currentDetections);
+
   return (
     <AppContainer>
       <VideoContainer>
         <Video ref={videoRef} autoPlay muted playsInline />
         <Canvas ref={canvasRef} />
         {error && <ErrorMessage>{error}</ErrorMessage>}
+        
+        {/* 3D 화살표 애니메이션 */}
+        {detectionPositions.map((detection) => (
+          <React.Fragment key={detection.id}>
+            <DetectionArrow 
+              x={detection.x} 
+              y={detection.y} 
+              color={detection.color}
+            />
+            <DetectionLabel 
+              x={detection.x} 
+              y={detection.y} 
+              color={detection.color}
+            >
+              {detection.label}
+            </DetectionLabel>
+          </React.Fragment>
+        ))}
       </VideoContainer>
 
       {isLoading && (

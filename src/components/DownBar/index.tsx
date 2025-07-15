@@ -8,9 +8,9 @@ const DownBar = () => {
   return (
     <div>
       <S.MainWrap>
-        <S.Box>
+        <S.Box onClick={() => navigate('./Collection')}>
             <img src={CollectionIcon} alt="" />
-            <span onClick={() => navigate('./Collection')}>도감</span>
+            <span>도감</span>
         </S.Box>
         <S.Box onClick={() => navigate('/')}>
             <img src={HomeIcon} alt="" />

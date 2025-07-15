@@ -2,7 +2,6 @@ import styled from 'styled-components'
 
 export const Container = styled.div`
   min-height: 100vh;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,9 +15,10 @@ export const LoginCard = styled.div`
   background-color: #f7f7f7;
   border: 3px solid #bdbdbd;
   padding: 36px 28px 32px 28px;
-  max-width: 350px;
+  max-width: 393px;
   width: 100%;
-  min-height: 400px;
+  min-height: 792px;
+  height: 792px;
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -29,6 +29,7 @@ export const LoginCard = styled.div`
     padding: 30px 15px;
     max-width: 90vw;
     min-height: 300px;
+    height: auto;
   }
 `;
 

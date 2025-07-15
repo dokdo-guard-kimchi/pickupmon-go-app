@@ -50,7 +50,7 @@ const Battle: React.FC = () => {
         },
         {
             name:'쓰레기 줍기',
-            dmg: 80,
+            dmg: 280,
             maxUses: 2
         }
     ]
@@ -98,6 +98,33 @@ const Battle: React.FC = () => {
         }
     }
 
+    const sendExpToServer = async (exp: number): Promise<void> => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('토큰이 없습니다. 로그인 후 다시 시도해주세요.');
+            return;
+        }
+      
+        try {
+            const response = await fetch(`http://34.22.84.19:8080/user/${exp}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            console.log("exp: ",exp);
+
+            if (response.ok) {
+                console.log(`경험치 ${exp} 전송 성공!`);
+            } else {
+                console.error('경험치 전송 실패:', response.status);
+            }
+        } catch (error) {
+            console.error('API 호출 중 오류 발생:', error);
+        }
+    }
+
     const handleUserSkill = (damage: number, skillIndex: number): void => {
         if (!isUserTurn || gameOver || skillUses[skillIndex] <= 0) return;
         
@@ -127,7 +154,7 @@ const Battle: React.FC = () => {
             setGameOver(true);
             setWinner('유저');
             // 승리 메시지로 변경
-            setTimeout(() => {
+            setTimeout(async () => {
                 const randomExp = Math.floor(Math.random() * 141) + 10; // 10~150 랜덤
                 setBattleMessage({
                     attacker: '유저',
@@ -136,6 +163,11 @@ const Battle: React.FC = () => {
                     type: 'victory',
                     exp: randomExp
                 });
+                
+                // 경험치가 1 이상일 때 API로 전송
+                if (randomExp >= 1) {
+                    await sendExpToServer(randomExp);
+                }
             }, 1500);
         } else {
             setIsUserTurn(false);

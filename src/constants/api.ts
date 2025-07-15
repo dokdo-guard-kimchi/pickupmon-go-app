@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL
+export const API_URL = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL
 
 export interface SignupRequest {
   userId: string;
@@ -12,7 +12,7 @@ export interface LoginRequest {
 }
 
 export const signupUser = async (userData: SignupRequest): Promise<void> => {
-  const response = await fetch(`${API_URL}/signup`, {
+  const response = await fetch(`${API_URL}/auth/sign-up`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export const signupUser = async (userData: SignupRequest): Promise<void> => {
 };
 
 export const loginUser = async (userData: LoginRequest): Promise<void> => {
-  const response = await fetch(`${API_URL}/login`, {
+  const response = await fetch(`${API_URL}/auth/sign-in`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

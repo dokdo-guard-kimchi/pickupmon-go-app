@@ -198,39 +198,89 @@ const PopupInfo = styled.p`
 const PokemonTransition = styled.div<{ isVisible: boolean }>`
   position: fixed;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
-  height: 100%;
-  background: #000;
-  display: ${props => props.isVisible ? 'flex' : 'none'};
-  justify-content: center;
-  align-items: center;
+  max-width: 390px;
+  height: 100vh;
+  background: transparent;
+  display: ${props => props.isVisible ? 'block' : 'none'};
   z-index: 2000;
-  animation: ${props => props.isVisible ? 'pokemonSlide 0.8s ease-in-out' : 'none'};
+  overflow: hidden;
+`;
+
+const HorizontalLine = styled.div<{ delay: number; position: number }>`
+  position: absolute;
+  top: ${props => props.position}%;
+  right: -100%;
+  width: 100%;
+  height: 3px;
+  background: #000;
+  animation: horizontalLineSlide 2.5s ease-out ${props => props.delay}s forwards;
   
-  @keyframes pokemonSlide {
+  @keyframes horizontalLineSlide {
     0% {
-      clip-path: circle(0% at 50% 50%);
-    }
-    50% {
-      clip-path: circle(100% at 50% 50%);
+      right: -100%;
     }
     100% {
-      clip-path: circle(0% at 50% 50%);
+      right: 0;
     }
   }
 `;
 
-const TransitionContent = styled.div`
+const BackgroundReveal = styled.div<{ isVisible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  animation: ${props => props.isVisible ? 'backgroundFadeIn 3s ease-out forwards' : 'none'};
+  opacity: 0;
+  z-index: -1;
+  
+  @keyframes backgroundFadeIn {
+    0% {
+      opacity: 0;
+    }
+    70% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+`;
+
+const TransitionOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+`;
+
+const TransitionContent = styled.div<{ isVisible: boolean }>`
   color: white;
   font-size: 24px;
   font-weight: bold;
   text-align: center;
-  animation: fadeInOut 0.8s ease-in-out;
+  animation: ${props => props.isVisible ? 'textFadeIn 1.0s ease-out 1.5s forwards' : 'none'};
+  opacity: 0;
   
-  @keyframes fadeInOut {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
+  @keyframes textFadeIn {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.8);
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1);
+    }
   }
 `;
 
@@ -261,6 +311,7 @@ const TrashAIPage: React.FC = () => {
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
   const [detectionProgress, setDetectionProgress] = useState(0);
   const [isButtonActive, setIsButtonActive] = useState(false);
+  const progressDeclineIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [capturedDetection, setCapturedDetection] = useState<Detection | null>(null);
@@ -528,11 +579,32 @@ const TrashAIPage: React.FC = () => {
         }
       } else {
         if (detectionStartTimeRef.current !== null) {
-          console.log('감지 종료, 초기화');
+          console.log('감지 종료, 진행률 감소 시작');
+          detectionStartTimeRef.current = null;
+          
+          // 기존 감소 인터벌이 있으면 제거
+          if (progressDeclineIntervalRef.current) {
+            clearInterval(progressDeclineIntervalRef.current);
+          }
+          
+          // 점진적으로 진행률 감소 (차오르는 속도의 1.5배)
+          // 차오르는 속도: 3초에 100% = 33.33%/초
+          // 감소 속도: 33.33% * 1.5 = 50%/초
+          progressDeclineIntervalRef.current = setInterval(() => {
+            setDetectionProgress(prev => {
+              const newProgress = prev - 2.5; // 2.5%씩 감소 (50ms마다)
+              if (newProgress <= 0) {
+                if (progressDeclineIntervalRef.current) {
+                  clearInterval(progressDeclineIntervalRef.current);
+                  progressDeclineIntervalRef.current = null;
+                }
+                setIsButtonActive(false);
+                return 0;
+              }
+              return newProgress;
+            });
+          }, 50); // 50ms마다 감소
         }
-        detectionStartTimeRef.current = null;
-        setDetectionProgress(0);
-        setIsButtonActive(false);
       }
       
     } catch (error) {
@@ -558,6 +630,9 @@ const TrashAIPage: React.FC = () => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      if (progressDeclineIntervalRef.current) {
+        clearInterval(progressDeclineIntervalRef.current);
       }
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -587,6 +662,13 @@ const TrashAIPage: React.FC = () => {
       detectionStartTimeRef.current = null;
       setDetectionProgress(0);
       setIsButtonActive(false);
+      
+      // 감소 인터벌도 정리
+      if (progressDeclineIntervalRef.current) {
+        clearInterval(progressDeclineIntervalRef.current);
+        progressDeclineIntervalRef.current = null;
+      }
+      
       console.log('버튼 상태 초기화 완료');
     }
   }, [isButtonActive, currentDetections, captureDetectionArea]);
@@ -610,7 +692,7 @@ const TrashAIPage: React.FC = () => {
           setShowTransition(false);
           setCapturedImage(null);
           setCapturedDetection(null);
-        }, 800);
+        }, 3000);
       }, 2000);
       
       return () => clearTimeout(timer);
@@ -662,9 +744,23 @@ const TrashAIPage: React.FC = () => {
       </PopupOverlay>
 
       <PokemonTransition isVisible={showTransition}>
-        <TransitionContent>
-          쓰레기 분석 완료!
-        </TransitionContent>
+        <BackgroundReveal isVisible={showTransition} />
+        {Array.from({ length: 30 }, (_, i) => {
+          const position = (i * 3.33); // 위에서 아래로 3.33% 간격
+          const delay = i * 0.05; // 순차적 시작
+          return (
+            <HorizontalLine 
+              key={i} 
+              delay={delay} 
+              position={position}
+            />
+          );
+        })}
+        <TransitionOverlay>
+          <TransitionContent isVisible={showTransition}>
+            쓰레기 분석 완료!
+          </TransitionContent>
+        </TransitionOverlay>
       </PokemonTransition>
     </AppContainer>
   );

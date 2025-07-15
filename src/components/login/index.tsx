@@ -31,7 +31,7 @@ const Login = () => {
     try {
       await loginUser(formData);
       alert('로그인 성공!');
-      navigate('/main');
+      navigate('/');
     } catch (error) {
       alert(error instanceof Error ? error.message : '로그인에 실패했습니다.');
     } finally {

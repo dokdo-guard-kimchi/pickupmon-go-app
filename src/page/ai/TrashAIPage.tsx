@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
+import { Canvas as ThreeCanvas, useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
+import * as THREE from 'three';
 
 // 스타일 컴포넌트
 const AppContainer = styled.div`
@@ -97,46 +100,17 @@ const ErrorMessage = styled.div`
   z-index: 100;
 `;
 
-const DetectionArrow = styled.div<{ x: number; y: number; color: string }>`
+const ThreeJSContainer = styled.div`
   position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y}px;
-  width: 0;
-  height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-top: 30px solid ${props => props.color};
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-  animation: floatBob 2s ease-in-out infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   z-index: 50;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -30px;
-    left: -15px;
-    width: 0;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 20px solid ${props => props.color};
-    opacity: 0.8;
-  }
-  
-  @keyframes floatBob {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-8px);
-    }
-  }
 `;
 
-const DetectionLabel = styled.div<{ x: number; y: number; color: string }>`
-  position: absolute;
-  left: ${props => props.x}px;
-  top: ${props => props.y + 40}px;
+const DetectionLabel = styled.div<{ color: string }>`
   background: ${props => props.color};
   color: white;
   padding: 8px 12px;
@@ -144,19 +118,9 @@ const DetectionLabel = styled.div<{ x: number; y: number; color: string }>`
   font-size: 14px;
   font-weight: bold;
   white-space: nowrap;
-  transform: translateX(-50%);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  animation: floatBob 2s ease-in-out infinite 0.5s;
-  z-index: 50;
-  
-  @keyframes floatBob {
-    0%, 100% {
-      transform: translateX(-50%) translateY(0px);
-    }
-    50% {
-      transform: translateX(-50%) translateY(-8px);
-    }
-  }
+  transform: translateX(-50%);
+  margin-top: 10px;
 `;
 
 // 타입 정의
@@ -176,6 +140,79 @@ interface ModelConfig {
   version: string;
   publishableKey: string;
 }
+
+// 3D 정사면체 컴포넌트
+const Tetrahedron: React.FC<{ color: string }> = ({ color }) => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      // 회전 애니메이션 (Z축 고정, 뾰족한 면이 항상 아래)
+      meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.3;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.8;
+      meshRef.current.rotation.z = 0; // Z축 회전 고정
+      
+      // 위아래 플로팅 애니메이션
+      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.5;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 0, 0]} rotation={[0, 0, 0]}>
+      <tetrahedronGeometry args={[1, 0]} />
+      <meshStandardMaterial 
+        color={color} 
+        metalness={0.3}
+        roughness={0.4}
+        emissive={color}
+        emissiveIntensity={0.1}
+      />
+    </mesh>
+  );
+};
+
+// 3D 포인터 컴포넌트 (게임 스타일)
+const GamePointer: React.FC<{ 
+  targetX: number; 
+  targetY: number; 
+  color: string; 
+  label: string;
+  containerWidth: number;
+  containerHeight: number;
+}> = ({ targetX, targetY, color, label, containerWidth, containerHeight }) => {
+  // 타겟 위치를 화면 상단으로 매핑
+  const pointerX = (targetX / containerWidth) * 4 - 2; // -2 to 2 range
+  const pointerY = 2; // 화면 상단 고정
+  const pointerZ = 0;
+
+  return (
+    <group position={[pointerX, pointerY, pointerZ]}>
+      <Tetrahedron color={color} />
+      <Html center>
+        <DetectionLabel color={color}>
+          {label}
+        </DetectionLabel>
+      </Html>
+      {/* 타겟으로 향하는 라인 */}
+      <line>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            array={new Float32Array([
+              0, 0, 0,
+              (targetX / containerWidth) * 4 - 2 - pointerX, 
+              (-(targetY / containerHeight) * 4 + 2) - pointerY, 
+              0
+            ])}
+            count={2}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <lineBasicMaterial color={color} opacity={0.6} transparent />
+      </line>
+    </group>
+  );
+};
 
 // 메인 컴포넌트
 const TrashAIPage: React.FC = () => {
@@ -345,10 +382,12 @@ const TrashAIPage: React.FC = () => {
       
       return {
         x: centerX,
-        y: centerY - 50,
+        y: centerY,
         color,
         label,
-        id: `${prediction.class}-${centerX}-${centerY}`
+        id: `${prediction.class}-${centerX}-${centerY}`,
+        containerWidth: containerRect.width,
+        containerHeight: containerRect.height
       };
     });
   }, [classColors]);
@@ -367,7 +406,14 @@ const TrashAIPage: React.FC = () => {
       // 신뢰도 필터링 (0.5 이상)
       const filteredPredictions = predictions.filter((pred: Detection) => pred.confidence >= 0.5);
       
-      setCurrentDetections(filteredPredictions);
+      // 가장 신뢰도가 높은 한 개만 선택
+      const topPrediction = filteredPredictions.length > 0 
+        ? [filteredPredictions.reduce((prev, current) => 
+            prev.confidence > current.confidence ? prev : current
+          )]
+        : [];
+      
+      setCurrentDetections(topPrediction);
       
     } catch (error) {
       console.error('감지 오류:', error);
@@ -408,23 +454,31 @@ const TrashAIPage: React.FC = () => {
         <Canvas ref={canvasRef} />
         {error && <ErrorMessage>{error}</ErrorMessage>}
         
-        {/* 3D 화살표 애니메이션 */}
-        {detectionPositions.map((detection) => (
-          <React.Fragment key={detection.id}>
-            <DetectionArrow 
-              x={detection.x} 
-              y={detection.y} 
-              color={detection.color}
-            />
-            <DetectionLabel 
-              x={detection.x} 
-              y={detection.y} 
-              color={detection.color}
+        {/* 3D 정사면체 포인터 (게임 스타일) */}
+        {detectionPositions.length > 0 && (
+          <ThreeJSContainer>
+            <ThreeCanvas
+              camera={{ position: [0, 0, 5], fov: 60 }}
+              style={{ background: 'transparent' }}
             >
-              {detection.label}
-            </DetectionLabel>
-          </React.Fragment>
-        ))}
+              <ambientLight intensity={0.4} />
+              <directionalLight position={[10, 10, 5]} intensity={0.8} />
+              <pointLight position={[-10, -10, -5]} intensity={0.3} />
+              
+              {detectionPositions.map((detection) => (
+                <GamePointer
+                  key={detection.id}
+                  targetX={detection.x}
+                  targetY={detection.y}
+                  color={detection.color}
+                  label={detection.label}
+                  containerWidth={detection.containerWidth}
+                  containerHeight={detection.containerHeight}
+                />
+              ))}
+            </ThreeCanvas>
+          </ThreeJSContainer>
+        )}
       </VideoContainer>
 
       {isLoading && (

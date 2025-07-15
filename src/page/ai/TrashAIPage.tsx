@@ -97,6 +97,60 @@ const ErrorMessage = styled.div`
   z-index: 100;
 `;
 
+const CameraButtonContainer = styled.div`
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+`;
+
+const CameraButton = styled.button<{ isActive: boolean; progress: number }>`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: ${props => props.isActive ? '#3498db' : '#7f8c8d'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ${props => props.isActive ? 'pointer' : 'not-allowed'};
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: ${props => props.isActive ? 'scale(1.1)' : 'none'};
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: ${props => props.progress}%;
+    background: linear-gradient(to top, #2ecc71, #27ae60);
+    transition: height 0.1s ease;
+    z-index: 1;
+  }
+  
+  svg {
+    width: 40px;
+    height: 40px;
+    fill: white;
+    z-index: 2;
+    position: relative;
+  }
+`;
+
+const CameraIcon = () => (
+  <svg viewBox="0 0 24 24">
+    <path d="M12 15.2c-2.8 0-5.1-2.3-5.1-5.1S9.2 5 12 5s5.1 2.3 5.1 5.1-2.3 5.1-5.1 5.1zm0-8.4c-1.8 0-3.3 1.5-3.3 3.3s1.5 3.3 3.3 3.3 3.3-1.5 3.3-3.3-1.5-3.3-3.3-3.3z"/>
+    <path d="M21 19H3c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h3.5l1.4-1.4c.6-.6 1.4-.9 2.1-.9h4c.7 0 1.5.3 2.1.9L17.5 5H21c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2zM3 7v10h18V7h-4l-1.4-1.4c-.3-.3-.7-.6-1.1-.6h-4c-.4 0-.8.3-1.1.6L8 7H3z"/>
+  </svg>
+);
+
 // 타입 정의
 interface Detection {
   class: string;
@@ -122,6 +176,8 @@ const TrashAIPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDetections, setCurrentDetections] = useState<Detection[]>([]);
+  const [detectionProgress, setDetectionProgress] = useState(0);
+  const [isButtonActive, setIsButtonActive] = useState(false);
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -130,6 +186,7 @@ const TrashAIPage: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const inferEngineRef = useRef<any>(null);
   const workerIdRef = useRef<string | null>(null);
+  const detectionStartTimeRef = useRef<number | null>(null);
 
   // 모델 설정
   const MODEL_CONFIG: ModelConfig = {
@@ -323,6 +380,32 @@ const TrashAIPage: React.FC = () => {
       setCurrentDetections(filteredPredictions);
       drawDetections(filteredPredictions);
       
+      // 3초 감지 로직
+      const now = Date.now();
+      if (filteredPredictions.length > 0) {
+        if (detectionStartTimeRef.current === null) {
+          detectionStartTimeRef.current = now;
+          console.log('감지 시작!', now);
+        } else {
+          const elapsedTime = now - detectionStartTimeRef.current;
+          const progress = Math.min((elapsedTime / 3000) * 100, 100);
+          setDetectionProgress(progress);
+          console.log('진행률:', progress, '%, 경과시간:', elapsedTime);
+          
+          if (elapsedTime >= 3000) {
+            setIsButtonActive(true);
+            console.log('버튼 활성화!');
+          }
+        }
+      } else {
+        if (detectionStartTimeRef.current !== null) {
+          console.log('감지 종료, 초기화');
+        }
+        detectionStartTimeRef.current = null;
+        setDetectionProgress(0);
+        setIsButtonActive(false);
+      }
+      
     } catch (error) {
       console.error('감지 오류:', error);
     }
@@ -353,12 +436,37 @@ const TrashAIPage: React.FC = () => {
     };
   }, []);
 
+  // 카메라 버튼 클릭 핸들러
+  const handleCameraClick = useCallback(() => {
+    if (isButtonActive) {
+      console.log('카메라 버튼 클릭됨! 현재 감지된 쓰레기:', currentDetections);
+      console.log('감지 시작 시간:', detectionStartTimeRef.current);
+      console.log('진행률:', detectionProgress);
+      
+      // 버튼 클릭 후 상태 초기화
+      detectionStartTimeRef.current = null;
+      setDetectionProgress(0);
+      setIsButtonActive(false);
+      console.log('버튼 상태 초기화 완료');
+    }
+  }, [isButtonActive, currentDetections, detectionProgress]);
+
   return (
     <AppContainer>
       <VideoContainer>
         <Video ref={videoRef} autoPlay muted playsInline />
         <Canvas ref={canvasRef} />
         {error && <ErrorMessage>{error}</ErrorMessage>}
+        
+        <CameraButtonContainer>
+          <CameraButton
+            isActive={isButtonActive}
+            progress={detectionProgress}
+            onClick={handleCameraClick}
+          >
+            <CameraIcon />
+          </CameraButton>
+        </CameraButtonContainer>
       </VideoContainer>
 
       {isLoading && (

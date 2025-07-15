@@ -83,7 +83,6 @@ export const Input = styled.input`
   background: #fff;
   color: #222;
   font-size: 1rem;
-  font-family: 'Press Start 2P', cursive, Arial, sans-serif;
   outline: none;
   box-sizing: border-box;
   transition: border 0.2s;

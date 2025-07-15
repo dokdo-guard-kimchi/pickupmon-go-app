@@ -9,6 +9,13 @@ export const Container = styled.div`
   background: repeating-linear-gradient(45deg, #e0e0e0 0 10px, #f5f5f5 10px 20px);
   font-family: 'Press Start 2P', cursive, Arial, sans-serif;
   padding: 0;
+  
+  /* iPhone 15 optimizations */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+    overflow: hidden;
+  }
 `
 
 export const GameCard = styled.div`
@@ -27,6 +34,19 @@ export const GameCard = styled.div`
   align-items: center;
   justify-content: center;
   flex-grow: 1;
+  
+  /* iPhone 15 specific dimensions (393x852) */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    max-width: 353px; /* 393px - 40px margin */
+    width: calc(100vw - 40px);
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px); /* Dynamic viewport height */
+    min-height: auto;
+    padding: 30px 20px;
+    margin: 30px 20px;
+    border-radius: 20px;
+    box-sizing: border-box;
+  }
   
   @media (max-width: 480px) {
     padding: 30px 15px;
@@ -51,6 +71,13 @@ export const Title = styled.h1`
   text-shadow: 2px 2px 0 #fff, 4px 4px 0 #bdbdbd;
   letter-spacing: 2px;
   
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    font-size: 1.8rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+  }
+  
   @media (max-width: 480px) {
     font-size: 1.5rem;
     letter-spacing: 1px;
@@ -64,6 +91,13 @@ export const Subtitle = styled.p`
   line-height: 1.5;
   text-shadow: 1px 1px 0 #fff, 2px 2px 0 #bdbdbd;
   
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    font-size: 0.85rem;
+    margin-bottom: 35px;
+    line-height: 1.4;
+  }
+  
   @media (max-width: 480px) {
     font-size: 0.8rem;
     margin-bottom: 30px;
@@ -75,6 +109,12 @@ export const ButtonContainer = styled.div`
   flex-direction: column;
   gap: 20px;
   width: 80%;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    gap: 18px;
+    width: 85%;
+  }
 `
 
 export const LoginButton = styled.button`
@@ -92,6 +132,14 @@ export const LoginButton = styled.button`
   text-shadow: 1px 1px 0 #fff;
   letter-spacing: 1px;
   width: 100%;
+  
+  /* iPhone 15 specific */
+  @media screen and (max-width: 393px) and (max-height: 852px) {
+    font-size: 0.95rem;
+    padding: 17px 0;
+    letter-spacing: 0.8px;
+    border-radius: 10px;
+  }
   
   @media (max-width: 480px) {
     font-size: 0.9rem;

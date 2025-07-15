@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Container, Card, AvatarWrapper, Avatar, Nickname, ExpBarArea, LevelRow, LevelLabel, LevelValue, ExpBar, ExpBarFill, ExpText, Skills, SkillButton, StartButton } from './style'
-import AvatarImg from '../../assets/boy.svg'
+import BoyImg from '../../assets/boy.svg'
+import GirlImg from '../../assets/girl.svg'
 import DownBar from '../DownBar/index'
 import { getUserInfo, type UserResponse } from '../../constants/api'
 
@@ -70,11 +71,15 @@ const Main = () => {
   const maxExp = 100; // 레벨당 필요한 경험치
   const expPercent = (currentLevelExp / maxExp) * 100;
 
+  // 선택된 캐릭터에 따라 아바타 이미지 결정
+  const selectedCharacter = localStorage.getItem('selectedCharacter');
+  const avatarImg = selectedCharacter === 'female' ? GirlImg : BoyImg;
+
   return (
     <Container>
       <Card>
         <AvatarWrapper>
-          <Avatar src={AvatarImg} alt="사용자 캐릭터" />
+          <Avatar src={avatarImg} alt="사용자 캐릭터" />
         </AvatarWrapper>
         <Nickname>{userInfo.name}</Nickname>
         <ExpBarArea>

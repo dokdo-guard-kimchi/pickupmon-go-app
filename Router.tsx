@@ -6,6 +6,8 @@ import Start from './src/components/start/index'
 import Login from './src/components/login/index'
 import SignUp from './src/components/signup/index'
 import Charactor from './src/components/charactor/index'
+import Collection from './src/components/Collection/index'
+
 
 const Router = () => {
   return (
@@ -17,6 +19,8 @@ const Router = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/signUp' element={<SignUp />} />
         <Route path='/charactor' element={<Charactor />} />
+        <Route path='/collection' element={<Collection />} />
+
       </Routes>
     </BrowserRouter>
   )

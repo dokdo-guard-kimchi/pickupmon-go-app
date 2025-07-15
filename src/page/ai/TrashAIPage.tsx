@@ -195,24 +195,42 @@ const PopupInfo = styled.p`
   font-size: 14px;
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ff4757;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
+const PokemonTransition = styled.div<{ isVisible: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: ${props => props.isVisible ? 'flex' : 'none'};
   justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: ${props => props.isVisible ? 'pokemonSlide 0.8s ease-in-out' : 'none'};
   
-  &:hover {
-    background: #ff3742;
+  @keyframes pokemonSlide {
+    0% {
+      clip-path: circle(0% at 50% 50%);
+    }
+    50% {
+      clip-path: circle(100% at 50% 50%);
+    }
+    100% {
+      clip-path: circle(0% at 50% 50%);
+    }
+  }
+`;
+
+const TransitionContent = styled.div`
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  animation: fadeInOut 0.8s ease-in-out;
+  
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
   }
 `;
 
@@ -246,6 +264,7 @@ const TrashAIPage: React.FC = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [capturedDetection, setCapturedDetection] = useState<Detection | null>(null);
+  const [showTransition, setShowTransition] = useState(false);
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -579,6 +598,25 @@ const TrashAIPage: React.FC = () => {
     setCapturedDetection(null);
   }, []);
 
+  // 팝업 표시 시 2초 후 자동 닫기 및 트랜지션 효과
+  useEffect(() => {
+    if (isPopupVisible) {
+      const timer = setTimeout(() => {
+        setIsPopupVisible(false);
+        setShowTransition(true);
+        
+        // 트랜지션 애니메이션 후 상태 정리
+        setTimeout(() => {
+          setShowTransition(false);
+          setCapturedImage(null);
+          setCapturedDetection(null);
+        }, 800);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isPopupVisible]);
+
   return (
     <AppContainer>
       <VideoContainer>
@@ -606,9 +644,8 @@ const TrashAIPage: React.FC = () => {
         </LoadingOverlay>
       )}
 
-      <PopupOverlay isVisible={isPopupVisible} onClick={handleClosePopup}>
-        <PopupContent onClick={(e) => e.stopPropagation()}>
-          <CloseButton onClick={handleClosePopup}>×</CloseButton>
+      <PopupOverlay isVisible={isPopupVisible}>
+        <PopupContent>
           {capturedImage && (
             <>
               <PopupImage src={capturedImage} alt="감지된 쓰레기" />
@@ -623,6 +660,12 @@ const TrashAIPage: React.FC = () => {
           )}
         </PopupContent>
       </PopupOverlay>
+
+      <PokemonTransition isVisible={showTransition}>
+        <TransitionContent>
+          쓰레기 분석 완료!
+        </TransitionContent>
+      </PokemonTransition>
     </AppContainer>
   );
 };

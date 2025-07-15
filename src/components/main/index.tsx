@@ -12,7 +12,7 @@ const Main = () => {
   const exp = 4;
   const maxExp = 18;
   const skills = [
-    { name: '정화 공격', dmg: 10, maxUses: 5 },
+    { name: '정화\n공격', dmg: 10, maxUses: 5 },
     { name: '때리기', dmg: 25, maxUses: 5 },
     { name: '쓰레기\n분쇄공격', dmg: 35, maxUses: 3 },
     { name: '쓰레기\n줍기', dmg: 80, maxUses: 2 },

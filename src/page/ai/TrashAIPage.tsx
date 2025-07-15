@@ -7,7 +7,7 @@ const AppContainer = styled.div`
   padding: 0;
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #000;
+  background: repeating-linear-gradient(45deg, #e0e0e0 0 10px, #f5f5f5 10px 20px);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -45,8 +45,10 @@ const Canvas = styled.canvas`
 const LoadingOverlay = styled.div`
   position: fixed;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
+  max-width: 390px;
   height: 100%;
   background: rgba(0, 0, 0, 0.9);
   display: flex;

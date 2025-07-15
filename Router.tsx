@@ -1,7 +1,6 @@
-import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Main from './src/components/main/index'
-import BattlePage from './src/components/battle';
+import BattlePage from './src/components/Battle';
 import Start from './src/components/start/index'
 import Login from './src/components/login/index'
 import SignUp from './src/components/signup/index'

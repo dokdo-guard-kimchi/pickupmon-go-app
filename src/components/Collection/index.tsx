@@ -1,5 +1,4 @@
 import * as S from './style';
-import React from 'react'
 import DownBar from '../DownBar/index'
 import imageTest from '../../assets/boy.svg'; // 예시 이미지 경로
 

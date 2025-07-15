@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Container, Card, Title, CharList, CharButton, CharEmoji, CharLabel, ConfirmButton, RedPoly, BluePoly, PolygonWraper, ImgWraper } from './style'
+import { Container, Card, Title, ConfirmButton, RedPoly, BluePoly, PolygonWraper, ImgWraper } from './style'
 import Boy from '../../assets/boy.svg'
 import Girl from '../../assets/girl.svg'
 

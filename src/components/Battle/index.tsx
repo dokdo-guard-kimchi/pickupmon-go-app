@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import * as S from './style';
-import battleeStand from  '../../assets/BattleStand.svg';
+import battleStand from  '../../assets/battleStand.svg';
 import trash1 from '../../assets/trash1.svg'
 import UserBattleIcon from '../../assets/UserBattleIcon.svg'
 
@@ -24,7 +24,7 @@ const Battle: React.FC = () => {
     const [userHp, setUserHp] = useState<number>(100);
     const [isUserTurn, setIsUserTurn] = useState<boolean>(true);
     const [gameOver, setGameOver] = useState<boolean>(false);
-    const [winner, setWinner] = useState<string>('');
+    const [, setWinner] = useState<string>('');
     const [showSkills, setShowSkills] = useState<boolean>(true);
     const [battleMessage, setBattleMessage] = useState<BattleMessage | null>(null);
     const [userAnimation, setUserAnimation] = useState<string>('');
@@ -246,7 +246,7 @@ const Battle: React.FC = () => {
                         <S.AnimatedTrash $animation={trashAnimation}>
                             <img src={trash1} alt="" />
                         </S.AnimatedTrash>
-                        <img src={battleeStand} alt="" />
+                        <img src={battleStand} alt="" />
                     </S.ImgWrapper>
                 </S.TrashWrapper>
                 
@@ -255,7 +255,7 @@ const Battle: React.FC = () => {
                         <S.AnimatedUser $animation={userAnimation}>
                             <img src={UserBattleIcon} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />
                         </S.AnimatedUser>
-                        <img src={battleeStand} alt="" />
+                        <img src={battleStand} alt="" />
                     </S.UserWrapperImg>
                     <S.UserWrapperNameHp>
                         <S.BorderBox>

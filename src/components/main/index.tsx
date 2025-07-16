@@ -37,31 +37,20 @@ const Main = () => {
 
   // 사용자 정보 가져오기
   useEffect(() => {
-    // 임시 데이터로 설정
-    const tempUserInfo = {
-      userId: "test",
-      password: "",
-      name: "독도수비대김치",
-      xp: 150,
-      role: "USER"
+    const fetchUserInfo = async () => {
+      try {
+        const data = await getUserInfo();
+        setUserInfo(data);
+      } catch (error) {
+        console.error('사용자 정보 가져오기 실패:', error);
+        // 에러 시 로그인 페이지로 리다이렉트
+        navigate('/login');
+      } finally {
+        setLoading(false);
+      }
     };
-    setUserInfo(tempUserInfo);
-    setLoading(false);
-    
-    // const fetchUserInfo = async () => {
-    //   try {
-    //     const data = await getUserInfo();
-    //     setUserInfo(data);
-    //   } catch (error) {
-    //     console.error('사용자 정보 가져오기 실패:', error);
-    //     // 에러 시 로그인 페이지로 리다이렉트
-    //     navigate('/login');
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
 
-    // fetchUserInfo();
+    fetchUserInfo();
   }, [navigate, setUserInfo, setLoading]);
 
   if (loading) {

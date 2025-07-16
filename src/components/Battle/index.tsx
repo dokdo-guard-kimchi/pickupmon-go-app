@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { AppContainer, BattlePageWrapper } from '../../styles/common'
 import * as S from './style';
 import battleStand from  '../../assets/battleStand.svg';
 import trash1 from '../../assets/trash1.svg'
@@ -224,8 +225,8 @@ const Battle: React.FC = () => {
     }, [isUserTurn, gameOver, showSkills, userSkillList, trashHp, skillUses]);
 
     return (
-        <S.MainWrapper>
-            <S.WebAppConteainer>
+        <AppContainer>
+            <BattlePageWrapper>
                 <S.TurnIndicator>
                     {gameOver ? '게임 종료' : isUserTurn ? '유저 턴' : '쓰레기 턴'}
                 </S.TurnIndicator>
@@ -256,7 +257,7 @@ const Battle: React.FC = () => {
                     <S.UserWrapperImg>
                         <S.AnimatedUser $animation={userAnimation}>
                             {gender === 'male' &&    <img src={UserBattleIcon} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />}
-                            {gender === 'female' && <img src={UserBattleFemale} alt="" style={{position:"relative",top:'10%',left:"9%",zIndex:"1"}} />}
+                            {gender === 'female' && <img src={UserBattleFemale} alt="" style={{position:"relative",top:'10%',left:"-5%",zIndex:"1"}} />}
                         </S.AnimatedUser>
                         <img src={battleStand} alt="" />
                     </S.UserWrapperImg>
@@ -320,8 +321,8 @@ const Battle: React.FC = () => {
                         )}
                     </S.SkiilBox>
                 </S.SkillBoxWrap>
-            </S.WebAppConteainer>
-        </S.MainWrapper>
+            </BattlePageWrapper>
+        </AppContainer>
     )
 }
 

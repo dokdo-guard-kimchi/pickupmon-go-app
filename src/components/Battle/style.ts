@@ -98,10 +98,13 @@ export const WebAppConteainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 399px;
+    width: 393px;
     height: 852px;
     border: 1px solid black;
     background-color: white;
+    max-width: 100vw;
+    max-height: 100vh;
+    overflow: hidden;
 `;
 
 export const TurnIndicator = styled.div`
@@ -115,15 +118,16 @@ export const TurnIndicator = styled.div`
     font-family: 'Press Start 2P', cursive, Arial, sans-serif;
     font-size: 12px;
     border-radius: 20px;
-    margin-bottom: 20px;
+    margin: 10px 0;
 `;
 
 export const TrashWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: end;
-    width: 412px;
-    height: 260px;
+    width: 100%;
+    max-width: 393px;
+    height: 240px;
 `;
 
 export const BorderBox = styled.div`
@@ -138,11 +142,12 @@ export const BorderBox = styled.div`
 `;
 
 export const UserWrapper = styled.div`
-    margin-top: 30px;
+    margin-top: 20px;
     display: flex;
     flex-direction: row;
-    width: 412px;
-    height: 230px;
+    width: 100%;
+    max-width: 393px;
+    height: 200px;
     
     img:nth-child(2) {
         position: relative;
@@ -156,14 +161,16 @@ export const ImgWrapper = styled.div`
     display: flex;
     align-items: end;
     justify-content: end;
-    width: 412px;
-    height: 130px;
+    width: 100%;
+    height: 120px;
     
     img {
         z-index: 1;
         position: relative;
         bottom: 20%;
         right: 2%;
+        max-width: 120px;
+        height: auto;
     }
 `;
 
@@ -180,13 +187,13 @@ export const AnimatedTrash = styled.div<AnimationProps>`
 `;
 
 export const UserWrapperImg = styled.div`
-    height: 230px;
-    width: 130px;
+    height: 400px;
+    width: 120px;
 `;
 
 export const UserWrapperNameHp = styled.div`
-    width: 220px;
-    height: 230px;
+    width: 200px;
+    height: 200px;
 `;
 
 export const BorderBoxHeader = styled.div`
@@ -196,6 +203,7 @@ export const BorderBoxHeader = styled.div`
     width: 250px;
     height: 25px;
     gap: 10px;
+    margin: 5px 0 0 0;
 `;
 
 export const BorderBoxHeaderName = styled.span`
@@ -251,37 +259,41 @@ export const HpNumber = styled.div`
 
 export const SkillBoxWrap = styled.div`
     padding-top: 5px;
-    width: 394px;
-    height: 251px;
-    border: 3px solid #838383;
+    width: 100%;
+    max-width: 393px;
+    height: 280px;
     border-bottom: none;
     border-radius: 15px 15px 0px 0px;
+    box-sizing: border-box;
 `;
 
 export const SkiilBox = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 382px;
-    height: 271px;
-    border: 3px solid #838383;
+    width: 100%;
+    height: 100%;
+    border-top: 2px solid #838383;
     border-radius: 15px 15px 0px 0px;
-    border-bottom: none;
+    box-sizing: border-box;
 `;
 
 export const Skills = styled.div`
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    width: 322px;
-    height: 261px;
-    gap: 20px;
+    width: 90%;
+    height: 90%;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
 `;
 
 export const Skill = styled.div<SkillProps>`
     display: flex;
-    width: 148px;
-    height: 101px;
+    
+    width: 140px;
+    height: 90px;
     border: 1px solid #838383;
     border-radius: 12px;
     cursor: ${props => props.$disabled ? 'not-allowed' : 'pointer'};
@@ -364,8 +376,6 @@ export const BattleMessage = styled.div<BattleMessageProps>`
     align-items: center;
     width: 300px;
     height: 200px;
-    background-color: ${props => props.$type === 'victory' ? '#FFD700' : '#f8f8f8'};
-    border: 3px solid #838383;
     border-radius: 15px;
     padding: 20px;
     animation: fadeIn 0.5s ease-in;
@@ -395,7 +405,7 @@ export const SkillInfo = styled.div`
 export const VictoryText = styled.div`
     font-family: 'Press Start 2P', cursive, Arial, sans-serif;
     font-size: 18px;
-    color: #FF6B00;
+    /* color: #FF6B00; */
     margin-bottom: 15px;
     font-weight: bold;
     text-align: center;

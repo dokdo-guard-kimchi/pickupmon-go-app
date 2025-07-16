@@ -1,3 +1,4 @@
+import { AppContainer, PageWrapper } from '../../styles/common'
 import * as S from './style';
 import DownBar from '../DownBar/index'
 import imageTest from '../../assets/boy.svg'; // 예시 이미지 경로
@@ -42,9 +43,12 @@ const index = () => {
         <S.MainWrap>
             <S.HeaderWrap>
                 <S.Title>Collection</S.Title>
-                <span style={{position:'relative',left:'7%'}}>내가 모은 쓰레기: 72개</span>
+                <S.TrashCountDisplay>
+                    <S.TrashCountText>내가 모은 쓰레기:</S.TrashCountText>
+                    <S.TrashCountNumber>72개</S.TrashCountNumber>
+                </S.TrashCountDisplay>
             </S.HeaderWrap>
-            <S.MainCollectionWrap>
+            <S.MainCollectionWrap ref={scrollRef} onScroll={handleScroll} $hasScrolled={hasScrolled}>
                 <S.CollectionBoxWrap>
                     <img src={imageTest} alt="" />
                     <S.CollectionName>환경파괴범세빈</S.CollectionName>
@@ -73,8 +77,9 @@ const index = () => {
             </S.MainCollectionWrap>
             <DownBar/>
         </S.MainWrap>
-    </S.Wrap>
-  )
+        </PageWrapper>
+    </AppContainer>
+    )
 }
 
-export default index
+export default Index

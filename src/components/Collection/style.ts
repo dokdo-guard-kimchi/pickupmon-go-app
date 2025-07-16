@@ -39,9 +39,10 @@ export const MainCollectionWrap = styled.div`
     justify-content: space-between;
     align-content: flex-start;
     width: 318px;
-    height: 500px;
-    border: 1px solid;
- 
+    height: 350px;
+    max-height:350px;
+    overflow:auto;
+    overflow-x: hidden;
     box-sizing: border-box;
 `;
 

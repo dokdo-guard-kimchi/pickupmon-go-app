@@ -46,7 +46,7 @@ const Battle: React.FC = () => {
             maxUses: 5
         },
         {
-            name:'떄리기',
+            name:'때리기',
             dmg: 25,
             maxUses: 5
         },

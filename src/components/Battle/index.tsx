@@ -234,8 +234,8 @@ const Battle: React.FC = () => {
                     <S.BorderBox>
                         <S.BorderBoxHeader>
                             <S.HpText>Hp</S.HpText>
-                            <S.BorderBoxHeaderName>페트병페트병페트병</S.BorderBoxHeaderName>
-                            <S.Lv>Lv:1</S.Lv>
+                            <S.BorderBoxHeaderName>쓰레기</S.BorderBoxHeaderName>
+                            <S.Lv>Lv:4</S.Lv>
                         </S.BorderBoxHeader>
                         <S.HpWrapper>
                             <S.Hp $hpPercentage={getHpPercentage(trashHp, maxTrashHp)}></S.Hp>

@@ -8,12 +8,35 @@ export const Wrap = styled.div`
 `;
 
 export const MainWrap = styled.div`
+    background: #f7f7f7;
+    border: 4px solid #bdbdbd;
+    border-radius: 18px;
+    box-shadow: 0 0 0 6px #e0e0e0, 0 0 0 12px #bdbdbd;
+    max-width: 393px;
+    width: 393px;
+    margin: 0;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 393px;
     height: 852px;
-    border: 1px solid;
+    min-height: unset;
+    justify-content: flex-start;
+    position: relative;
+    box-sizing: border-box;
+    
+    /* iPhone 15 specific dimensions (393x852) */
+    @media screen and (max-width: 393px) and (max-height: 852px) {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height */
+        max-width: none;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        padding: 25px 20px 15px 20px;
+        overflow-y: auto;
+    }
 `;
 
 export const HeaderWrap = styled.div`

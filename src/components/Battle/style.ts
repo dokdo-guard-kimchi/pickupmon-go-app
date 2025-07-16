@@ -1,5 +1,12 @@
 import styled, { keyframes, css } from "styled-components";
 
+// 화면 전환 애니메이션
+const screenTransition = keyframes`
+    0% { transform: translateY(-100%); }
+    50% { transform: translateY(0%); }
+    100% { transform: translateY(100%); }
+`;
+
 interface HpProps {
     $hpPercentage: number;
 }
@@ -438,4 +445,18 @@ export const ResetButton = styled.button`
     &:active {
         transform: scale(0.95);
     }
+`;
+
+export const ScreenTransition = styled.div<{ $isAnimating: boolean }>`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: ${props => props.$isAnimating ? 1 : 0};
+    transform: ${props => props.$isAnimating ? 'translateY(0)' : 'translateY(-100%)'};
+    animation: ${props => props.$isAnimating ? css`${screenTransition} 0.8s ease-in-out` : 'none'};
 `;

@@ -115,8 +115,8 @@ const Main = () => {
               >
                 <div>{skill.name}</div>
                 {openedSkill === idx && (
-                  <div style={{ fontSize: '0.9rem', marginTop: 2 }}>
-                    ({skill.dmg}) / {skill.maxUses}회
+                  <div style={{ fontSize: '0.9rem', marginTop: 2, lineHeight: 1.5}}>
+                    ({skill.dmg})   {skill.maxUses}회
                   </div>
                 )}
               </SkillButton>

@@ -262,7 +262,6 @@ export const SkillBoxWrap = styled.div`
     width: 100%;
     max-width: 393px;
     height: 280px;
-    /* border: 3px solid #838383; */
     border-bottom: none;
     border-radius: 15px 15px 0px 0px;
     box-sizing: border-box;
@@ -274,9 +273,8 @@ export const SkiilBox = styled.div`
     align-items: center;
     width: 100%;
     height: 100%;
-    border: 2px solid #838383;
+    border-top: 2px solid #838383;
     border-radius: 15px 15px 0px 0px;
-    border-bottom: none;
     box-sizing: border-box;
 `;
 
@@ -378,8 +376,6 @@ export const BattleMessage = styled.div<BattleMessageProps>`
     align-items: center;
     width: 300px;
     height: 200px;
-    background-color: ${props => props.$type === 'victory' ? '#FFD700' : '#f8f8f8'};
-    border: 3px solid #838383;
     border-radius: 15px;
     padding: 20px;
     animation: fadeIn 0.5s ease-in;
@@ -409,7 +405,7 @@ export const SkillInfo = styled.div`
 export const VictoryText = styled.div`
     font-family: 'Press Start 2P', cursive, Arial, sans-serif;
     font-size: 18px;
-    color: #FF6B00;
+    /* color: #FF6B00; */
     margin-bottom: 15px;
     font-weight: bold;
     text-align: center;

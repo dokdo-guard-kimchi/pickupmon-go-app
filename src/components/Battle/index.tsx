@@ -5,6 +5,7 @@ import battleStand from  '../../assets/battleStand.svg';
 import trash1 from '../../assets/trash1.svg'
 import UserBattleIcon from '../../assets/UserBattleIcon.svg'
 import UserBattleFemale from '../../assets/UserBattleFemale.svg'
+import { useNavigate } from 'react-router-dom';
 
 interface Skill {
     name: string;
@@ -21,6 +22,8 @@ interface BattleMessage {
 }
 
 const Battle: React.FC = () => {
+    const navigate = useNavigate();
+
     const [maxTrashHp] = useState<number>(() => Math.floor(Math.random() * 201) + 100); // 100~300 랜덤
     const [trashHp, setTrashHp] = useState<number>(maxTrashHp);
     const [userHp, setUserHp] = useState<number>(100);
@@ -133,8 +136,8 @@ const Battle: React.FC = () => {
             setTimeout(() => {
                 const randomExp = Math.floor(Math.random() * 141) + 10; // 10~150 랜덤
                 setBattleMessage({
-                    attacker: '유저',
-                    skillName: '승리!',
+                    attacker: '유저(은)는',
+                    skillName: '승리했다!',
                     damage: 0,
                     type: 'victory',
                     exp: randomExp
@@ -172,8 +175,8 @@ const Battle: React.FC = () => {
             setWinner('쓰레기');
             setTimeout(() => {
                 setBattleMessage({
-                    attacker: '쓰레기',
-                    skillName: '승리!',
+                    attacker: '유저(은)는 패배했다!',
+                    skillName: '유저(은)는 눈앞이 깜깜해졌다...',
                     damage: 0,
                     type: 'victory'
                 });
@@ -189,20 +192,6 @@ const Battle: React.FC = () => {
 
     const getHpPercentage = (currentHp: number, maxHp: number): number => {
         return (currentHp / maxHp) * 100;
-    }
-
-    const resetGame = (): void => {
-        const newMaxTrashHp = Math.floor(Math.random() * 201) + 100; // 새로운 랜덤 체력
-        setTrashHp(newMaxTrashHp);
-        setUserHp(100);
-        setIsUserTurn(true);
-        setGameOver(false);
-        setWinner('');
-        setShowSkills(true);
-        setBattleMessage(null);
-        setUserAnimation('');
-        setTrashAnimation('');
-        setSkillUses([5, 5, 3, 2]); // 스킬 사용 횟수 초기화
     }
 
     useEffect(() => {
@@ -305,14 +294,14 @@ const Battle: React.FC = () => {
                                             <>
                                                 <S.AttackerName>{battleMessage.attacker}</S.AttackerName>
                                                 <S.SkillInfo>
-                                                    {battleMessage.skillName}로 {battleMessage.damage} 데미지!
+                                                    {battleMessage.skillName}(으)로 {battleMessage.damage} 데미지!
                                                 </S.SkillInfo>
                                             </>
                                         ) : (
                                             <>
                                                 <S.VictoryText>{battleMessage.attacker} {battleMessage.skillName}</S.VictoryText>
-                                                <S.ExpGain>{battleMessage.exp} 경험치 획득!</S.ExpGain>
-                                                <S.ResetButton onClick={resetGame}>다시 시작</S.ResetButton>
+                                                {battleMessage.exp && <S.ExpGain>{battleMessage.exp} 경험치 획득!</S.ExpGain>}
+                                                <S.ResetButton onClick={() => navigate('/')}>홈으로 가기</S.ResetButton>
                                             </>
                                         )}
                                     </S.BattleMessage>

@@ -6,6 +6,7 @@ import Login from './src/components/login/index'
 import SignUp from './src/components/signup/index'
 import Charactor from './src/components/charactor/index'
 import Collection from './src/components/Collection/index'
+import Shop from './src/components/Shop/index'
 import Ai from './src/page/ai/TrashAIPage'
 
 const Router = () => {
@@ -20,6 +21,7 @@ const Router = () => {
         <Route path='/signUp' element={<SignUp />} />
         <Route path='/charactor' element={<Charactor />} />
         <Route path='/collection' element={<Collection />} />
+        <Route path='/shop' element={<Shop />} />
 
       </Routes>
     </BrowserRouter>

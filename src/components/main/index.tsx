@@ -12,6 +12,7 @@ const Main = () => {
   // 사용자 정보 상태
   const [userInfo, setUserInfo] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [gold, setGold] = useState<number>(0);
 
   // 고정된 스킬 데이터
   const skills = [
@@ -49,6 +50,15 @@ const Main = () => {
       }
     };
 
+    // 골드 정보 가져오기
+    const storedGold = localStorage.getItem('playerGold');
+    if (storedGold) {
+      setGold(parseInt(storedGold));
+    } else {
+      localStorage.setItem('playerGold', '500');
+      setGold(500);
+    }
+
     fetchUserInfo();
   }, [navigate]);
 
@@ -75,6 +85,17 @@ const Main = () => {
   const selectedCharacter = localStorage.getItem('selectedCharacter');
   const avatarImg = selectedCharacter === 'female' ? GirlImg : BoyImg;
 
+  // 골드 업데이트 함수
+  const updateGold = (newAmount: number) => {
+    setGold(newAmount);
+    localStorage.setItem('playerGold', newAmount.toString());
+  };
+
+  // 골드 획득 함수 (임시 테스트용)
+  const earnGold = (amount: number) => {
+    updateGold(gold + amount);
+  };
+
   return (
     <Container>
       <Card>
@@ -82,6 +103,10 @@ const Main = () => {
           <Avatar src={avatarImg} alt="사용자 캐릭터" />
         </AvatarWrapper>
         <Nickname>{userInfo.name}</Nickname>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', background: '#fff', border: '2px solid #bdbdbd', borderRadius: '8px', padding: '8px 12px', boxShadow: '0 2px 0 #bdbdbd' }}>
+          <span style={{ color: '#ffc107', fontSize: '1rem' }}>💰</span>
+          <span style={{ fontSize: '1rem', color: '#333', fontWeight: 'bold' }}>{gold.toLocaleString()}</span>
+        </div>
         <ExpBarArea>
           <LevelRow>
             <LevelLabel>레벨</LevelLabel>
@@ -108,6 +133,8 @@ const Main = () => {
           ))}
         </Skills>
         <StartButton onClick={() => navigate('/camera')}>시작하기</StartButton>
+        <StartButton onClick={() => navigate('/shop')} style={{ marginTop: '10px', background: '#ff9800' }}>상점</StartButton>
+        <StartButton onClick={() => earnGold(100)} style={{ marginTop: '10px', background: '#4caf50', fontSize: '0.9rem' }}>골드 +100 (테스트)</StartButton>
         <DownBar />
       </Card>
     

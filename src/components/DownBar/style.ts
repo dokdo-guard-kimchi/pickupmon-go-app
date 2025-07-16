@@ -8,9 +8,9 @@ export const MainWrap = styled.div`
     justify-content:space-around;
     position:relative;
     top:134%;
-    width:393px;
+    width:380px;
     height:80px;
-    border-top:1px solid;
+    border-top: 1px solid lightgray;
 `
 export const Box = styled.div`
     display:flex;

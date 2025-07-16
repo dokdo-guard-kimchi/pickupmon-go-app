@@ -35,6 +35,7 @@ const Battle: React.FC = () => {
     const [userAnimation, setUserAnimation] = useState<string>('');
     const [trashAnimation, setTrashAnimation] = useState<string>('');
     const [skillUses, setSkillUses] = useState<number[]>([5, 5, 3, 2]); // 각 스킬의 남은 사용 횟수
+    const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
     const maxUserHp: number = 100;
     const gender = localStorage.getItem('selectedCharacter');
 
@@ -194,6 +195,13 @@ const Battle: React.FC = () => {
         return (currentHp / maxHp) * 100;
     }
 
+    const handleHomeNavigation = (): void => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+            navigate('/');
+        }, 400); // 애니메이션 중간 지점에서 네비게이션
+    };
+
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent): void => {
             if (!isUserTurn || gameOver || !showSkills) return;
@@ -215,6 +223,7 @@ const Battle: React.FC = () => {
 
     return (
         <AppContainer>
+            <S.ScreenTransition $isAnimating={isTransitioning} />
             <BattlePageWrapper>
                 <S.TurnIndicator>
                     {gameOver ? '게임 종료' : isUserTurn ? '유저 턴' : '쓰레기 턴'}
@@ -301,7 +310,7 @@ const Battle: React.FC = () => {
                                             <>
                                                 <S.VictoryText>{battleMessage.attacker} {battleMessage.skillName}</S.VictoryText>
                                                 {battleMessage.exp && <S.ExpGain>{battleMessage.exp} 경험치 획득!</S.ExpGain>}
-                                                <S.ResetButton onClick={() => navigate('/')}>홈으로 가기</S.ResetButton>
+                                                <S.ResetButton onClick={handleHomeNavigation}>홈으로 가기</S.ResetButton>
                                             </>
                                         )}
                                     </S.BattleMessage>

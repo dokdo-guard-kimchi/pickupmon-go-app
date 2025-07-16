@@ -89,12 +89,12 @@ const Main = () => {
           <ExpBarArea>
             <LevelRow>
               <LevelLabel>레벨</LevelLabel>
-              <LevelValue>{level}</LevelValue>
+              <LevelValue>{localStorage.getItem('userLevel')}</LevelValue>
             </LevelRow>
             <ExpBar>
               <ExpBarFill percent={expPercent} />
             </ExpBar>
-            <ExpText>{currentLevelExp} / {maxExp} EXP</ExpText>
+            <ExpText>{localStorage.getItem('userExp')} / {maxExp} EXP</ExpText>
           </ExpBarArea>
           <Skills>
             {skills.map((skill, idx) => (

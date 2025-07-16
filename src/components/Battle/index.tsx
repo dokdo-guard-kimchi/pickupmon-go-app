@@ -13,6 +13,12 @@ interface Skill {
     maxUses: number;
 }
 
+interface MonsterData {
+    name: string;
+    img: string;
+    skills: string[];
+}
+
 interface BattleMessage {
     attacker: string;
     skillName: string;
@@ -21,9 +27,38 @@ interface BattleMessage {
     exp?: number;
 }
 
+// 더미 데이터 생성 및 로컬 스토리지에 저장
+const initializeDummyMonsterData = (): void => {
+    const dummyMonsterData: MonsterData = {
+        name: '플라스틱 쓰레기 몬스터',
+        img: 'https://via.placeholder.com/150x150/ff6b6b/ffffff?text=Monster',
+        skills: ['독성 분출', '썩은 냄새 공격', '플라스틱 파편 투척']
+    };
+
+    localStorage.setItem('currentMonster', JSON.stringify(dummyMonsterData));
+};
+
 const Battle: React.FC = () => {
     const navigate = useNavigate();
 
+    // 로컬 스토리지에서 몬스터 데이터 가져오기
+    const getMonsterData = (): MonsterData => {
+        const savedMonsterData = localStorage.getItem('currentMonster');
+        
+        if (!savedMonsterData) {
+            // 더미 데이터 생성
+            initializeDummyMonsterData();
+            const newMonsterData = localStorage.getItem('currentMonster');
+            return JSON.parse(newMonsterData!);
+        }
+        
+        return JSON.parse(savedMonsterData);
+    };
+
+    const [currentMonster] = useState<MonsterData>(getMonsterData());
+    const [userLevel, setUserLevel] = useState<number>(() => {
+        return parseInt(localStorage.getItem('userLevel') || '1');
+    });
     const [maxTrashHp] = useState<number>(() => Math.floor(Math.random() * 201) + 100); // 100~300 랜덤
     const [trashHp, setTrashHp] = useState<number>(maxTrashHp);
     const [userHp, setUserHp] = useState<number>(100);
@@ -57,40 +92,35 @@ const Battle: React.FC = () => {
         },
         {
             name:'쓰레기 줍기',
-            dmg: 80,
+            dmg: 380,
             maxUses: 2
         }
     ]
 
-    const trashSkillList: Skill[] = [
-        {
-            name: '더러운 공격',
-            dmg: 15,
-            maxUses: 0
-        },
-        {
-            name: '냄새 공격',
-            dmg: 20,
-            maxUses: 0
-        },
-        {
-            name: '독성 분출',
-            dmg: 30,
-            maxUses: 0
-        }
-    ]
+    // 로컬 스토리지의 몬스터 데이터를 기반으로 스킬 생성 (데미지는 고정)
+    const monsterSkillList: Skill[] = currentMonster.skills.map((skillName, index) => ({
+        name: skillName,
+        dmg: [15, 20, 30][index] || 15, // 15, 20, 30 데미지 고정
+        maxUses: 0
+    }));
 
     const getSkillAnimation = (skillName: string): string => {
+        // 유저 스킬 애니메이션
         switch(skillName) {
             case '정화 공격': return 'purify';
-            case '떄리기': return 'punch';
+            case '때리기': return 'punch';
             case '쓰레기 분쇄공격': return 'crush';
             case '쓰레기 줍기': return 'pickup';
-            case '더러운 공격': return 'dirty';
-            case '냄새 공격': return 'smell';
-            case '독성 분출': return 'toxic';
-            default: return 'attack';
+            default: break;
         }
+        
+        // 쓰레기 스킬 애니메이션 (스킬 이름 기반)
+        if (skillName.includes('독') || skillName.includes('화학') || skillName.includes('독성')) return 'toxic';
+        if (skillName.includes('냄새') || skillName.includes('썩은')) return 'smell';
+        if (skillName.includes('공격') || skillName.includes('타격')) return 'attack';
+        if (skillName.includes('파편') || skillName.includes('베기')) return 'sharp';
+        
+        return 'attack';
     }
 
     const triggerAnimation = (attacker: 'user' | 'trash', skillName: string): void => {
@@ -103,6 +133,20 @@ const Battle: React.FC = () => {
             setTrashAnimation(animation);
             setTimeout(() => setTrashAnimation(''), 1000);
         }
+    }
+
+    const saveExpToLocal = (exp: number) => {
+        const currentExp = parseInt(localStorage.getItem('userExp') || '0');
+        const newExp = currentExp + exp;
+        const level = Math.floor(newExp / 150) + 1; // 150으로 나눈 몫 + 1이 레벨
+        
+        localStorage.setItem('userExp', newExp.toString());
+        localStorage.setItem('userLevel', level.toString());
+        
+        // 레벨 상태 업데이트
+        setUserLevel(level);
+        
+        console.log(`경험치 ${exp} 획득! 총 경험치: ${newExp}, 레벨: ${level}`);
     }
 
     const handleUserSkill = (damage: number, skillIndex: number): void => {
@@ -143,26 +187,28 @@ const Battle: React.FC = () => {
                     type: 'victory',
                     exp: randomExp
                 });
+                // 경험치를 로컬 스토리지에 저장
+                saveExpToLocal(randomExp);
             }, 1500);
         } else {
             setIsUserTurn(false);
             setTimeout(() => {
-                handleTrashTurn();
+                handleMonsterTurn();
             }, 2000);
         }
     }
 
-    const handleTrashTurn = (): void => {
+    const handleMonsterTurn = (): void => {
         if (gameOver) return;
         
-        const randomSkill = trashSkillList[Math.floor(Math.random() * trashSkillList.length)];
+        const randomSkill = monsterSkillList[Math.floor(Math.random() * monsterSkillList.length)];
         
         // 애니메이션 트리거
         triggerAnimation('trash', randomSkill.name);
         
         // 공격 메시지 표시
         setBattleMessage({
-            attacker: '쓰레기',
+            attacker: currentMonster.name,
             skillName: randomSkill.name,
             damage: randomSkill.dmg,
             type: 'attack'
@@ -173,7 +219,7 @@ const Battle: React.FC = () => {
         
         if (newUserHp === 0) {
             setGameOver(true);
-            setWinner('쓰레기');
+            setWinner(currentMonster.name);
             setTimeout(() => {
                 setBattleMessage({
                     attacker: '유저(은)는 패배했다!',
@@ -226,14 +272,14 @@ const Battle: React.FC = () => {
             <S.ScreenTransition $isAnimating={isTransitioning} />
             <BattlePageWrapper>
                 <S.TurnIndicator>
-                    {gameOver ? '게임 종료' : isUserTurn ? '유저 턴' : '쓰레기 턴'}
+                    {gameOver ? '게임 종료' : isUserTurn ? '유저 턴' : `${currentMonster.name} 턴`}
                 </S.TurnIndicator>
 
                 <S.TrashWrapper>
                     <S.BorderBox>
                         <S.BorderBoxHeader>
                             <S.HpText>Hp</S.HpText>
-                            <S.BorderBoxHeaderName>페트병페트병페트병</S.BorderBoxHeaderName>
+                            <S.BorderBoxHeaderName>{currentMonster.name}</S.BorderBoxHeaderName>
                             <S.Lv>Lv:1</S.Lv>
                         </S.BorderBoxHeader>
                         <S.HpWrapper>
@@ -245,7 +291,7 @@ const Battle: React.FC = () => {
                     </S.BorderBox>
                     <S.ImgWrapper>
                         <S.AnimatedTrash $animation={trashAnimation}>
-                            <img src={trash1} alt="" />
+                            <img src={currentMonster.img} alt={currentMonster.name} />
                         </S.AnimatedTrash>
                         <img src={battleStand} alt="" />
                     </S.ImgWrapper>
@@ -264,7 +310,7 @@ const Battle: React.FC = () => {
                             <S.BorderBoxHeader>
                                 <S.HpText>Hp</S.HpText>
                                 <S.BorderBoxHeaderName>유저</S.BorderBoxHeaderName>
-                                <S.Lv>Lv:1</S.Lv>
+                                <S.Lv>Lv:{userLevel}</S.Lv>
                             </S.BorderBoxHeader>
                             <S.HpWrapper>
                                 <S.Hp $hpPercentage={getHpPercentage(userHp, maxUserHp)}></S.Hp>
